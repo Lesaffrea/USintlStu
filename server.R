@@ -2,24 +2,31 @@ library(shiny)
 library(googleVis)
 #suppressPackageStartupMessages(require(googleVis))
 
-topcountries <- read.csv("data/topcountries2014.csv", header=F, skip=2,
-                         colClasses=c("factor",rep("character",3),rep("numeric",3)), 
-                         col.names=c("Rank","Country","prevSt","Students","Percent","Change","Year"))
+files <- list.files("data", full.names=T)
+topcountries <- data.frame()
+for (i in 1:length(files)) {
+    data <- read.csv(files[i], header=F, skip=2,
+                             colClasses=c("factor",rep("character",3),rep("numeric",3)), 
+                             col.names=c("Rank","Country","prevSt","Students","Percent","Change","Year"))
+    topcountries <- rbind(topcountries, data)
+}
+
 topcountries[,3:4] <- lapply(topcountries[,3:4],function(x){as.numeric(gsub(",", "", x))})
 
 shinyServer(
     function(input, output) {
-        topOrg <- reactive({
-            input$numOrg
+        myYear <- reactive({
+            input$year
         })
         
         output$gvisTitle <- renderText({ 
-            paste("Top", topOrg(), "Places of Origin in 2013/14")
+            paste("Top 25 Places of Origin in", myYear())
         })
         
         ## draw map
         output$gvmap <- renderGvis({
-            gvisGeoChart(topcountries,
+            myData <- subset(topcountries, Year==myYear())
+            gvisGeoChart(myData,
                          locationvar="Country", colorvar="Students",
                          options=list(region="world", displayMode="regions", 
                                       resolution="countries",

@@ -4,10 +4,10 @@ shinyUI(fluidPage(
     titlePanel("Trends of International Students in US"),
     sidebarLayout(
         sidebarPanel(
-            helpText("In 2013/14, where do the international students in US come from?"),
-            sliderInput("numOrg", 
-                        label = "Choose the number of top places of origin", 
-                        min=1, max=25, value=5,  step=1, animate=TRUE),
+            helpText("Where do the international students in US come from?"),
+            sliderInput("year", 
+                        label = "Choose a year to display", 
+                        min=2011, max=2014, value=2014,  step=1, animate=TRUE),
             
             helpText("How has the number of international students evolved over last 10 years?"),
             checkboxGroupInput("countries", 
