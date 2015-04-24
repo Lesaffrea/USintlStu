@@ -16,7 +16,7 @@ shinyUI(fluidPage(
             h3(textOutput("gvisTitle")),    
             htmlOutput("gvmap"),            
             htmlOutput("top10tab"),
-            textOutput("countries"),
+            htmlOutput("countries"),
             htmlOutput("lines")
         )        
     )    

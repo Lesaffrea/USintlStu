@@ -7,8 +7,8 @@ files <- list.files("data", full.names=T)
 topcountries <- data.frame()
 for (i in 1:length(files)) {
     data <- read.csv(files[i], header=F, skip=2,
-                             colClasses=c("factor",rep("character",3),rep("numeric",2),"factor"), 
-                             col.names=c("Rank","Country","prevSt","Students","Percent","Change","Year"))
+                     colClasses=c("factor",rep("character",3),rep("numeric",2),"factor"), 
+                     col.names=c("Rank","Country","prevSt","Students","Percent","Change","Year"))
     topcountries <- rbind(topcountries, data)
 }
 
@@ -17,6 +17,12 @@ topcountries[,3:4] <- lapply(topcountries[,3:4],function(x){as.numeric(gsub(",",
 topcountries$Country <- gsub("China.*", "China", topcountries$Country)
 topcountries$Country <- gsub("Hong Kong.*", "Hong Kong", topcountries$Country)
 topcountries$Country <- gsub("^Korea.*", "South Korea", topcountries$Country)
+
+linedata <- topcountries[,c("Country","Students","Year")]
+linedata <- melt(linedata, id.var=c("Year", "Country"))
+linedata <- dcast(linedata, Year ~ Country, value.var="value")
+
+countrylist <- names(linedata)[-1]
 
 ## list the countries that have always been on the top list 
 toplist <- unique(topcountries$Country)
@@ -50,25 +56,21 @@ shinyServer(
         
         # Create the checkboxes and select them all by default
         output$countrybox <- renderUI({
-        checkboxGroupInput("countries", 
-                           label = "Choose the countries of origin", 
-                           choices = toplist,
-                           selected = toplist[1:3])
+            checkboxGroupInput("countries", 
+                               label = "Choose the countries of origin", 
+                               choices = countrylist,
+                               selected = countrylist[1:3])
         })
         
         countryList <- reactive ({
             input$countries
         })
         
-        output$countries <- renderText({ 
-            paste("You have chosen",
-                  input$countries)
+        output$countries <- renderTable({ 
+            head(linedata)
         })
-                
+        
         output$lines <- renderGvis({
-            linedata <- topcountries[,c("Country","Students","Year")]
-            linedata <- melt(linedata, id.var=c("Year", "Country"))
-            linedata <- dcast(linedata, Year ~ Country, value.var="value")
             gvisLineChart(linedata,
                           options=list(width=800, height=800)
                           
