@@ -1,19 +1,20 @@
 library(shiny)
 library(googleVis)
 library(reshape2)
+library(dplyr)
 #suppressPackageStartupMessages(require(googleVis))
 
 files <- list.files("data", full.names=T)
 topcountries <- data.frame()
 for (i in 1:length(files)) {
     data <- read.csv(files[i], header=F, skip=2,
-                     colClasses=c("factor",rep("character",3),rep("numeric",2),"factor"), 
+                     colClasses=c("factor",rep("character",3),rep("numeric",2),"integer"), 
                      col.names=c("Rank","Country","prevSt","Students","Percent","Change","Year"))
     topcountries <- rbind(topcountries, data)
 }
 
-topcountries[,3:4] <- lapply(topcountries[,3:4],function(x){as.numeric(gsub(",", "", x))})
-## standardize country names in prepare for mapping
+topcountries[,3:4] <- lapply(topcountries[,3:4],function(x){as.integer(gsub(",", "", x))})
+## standardize country names in prepare for google geochart
 topcountries$Country <- gsub("China.*", "China", topcountries$Country)
 topcountries$Country <- gsub("Hong Kong.*", "Hong Kong", topcountries$Country)
 topcountries$Country <- gsub("^Korea.*", "South Korea", topcountries$Country)
@@ -59,23 +60,41 @@ shinyServer(
             checkboxGroupInput("countries", 
                                label = "Choose the countries of origin", 
                                choices = countrylist,
-                               selected = countrylist[1:3])
+                               selected = c("China","India","Japan")
+                               )
         })
         
-        countryList <- reactive ({
+#         # Create the checkboxes and select them all by default
+#         checkboxGroupInput("columns", "Choose columns", 
+#                            choices  = colnames,
+#                            selected = colnames)
+        
+        mycountries <- reactive ({
             input$countries
         })
         
-        output$countries <- renderTable({ 
-            head(linedata)
+#         output$temp <- renderText({
+#             input$countries
+#         })
+# 
+#         output$temp2 <- renderText({
+#             c("Year","China","India","Japan")
+#         })
+
+        output$countrytab <- renderTable({ 
+            mylines <- linedata[, c("Year",input$countries), drop = FALSE]
+            #mylines <- select(linedata, Year, input$countries)
+            mylines
         })
         
+
         output$lines <- renderGvis({
-            gvisLineChart(linedata,
+            #colselected <- c(input$countries, "Mexico")
+            mylines <- linedata[, c("Year",input$countries), drop = FALSE]
+            #mylines <- linedata[, c("Year","China","South Korea"), drop = FALSE]
+            gvisLineChart(mylines,
                           options=list(width=800, height=800)
-                          
             )
-            
         })
         
     }

@@ -15,9 +15,12 @@ shinyUI(fluidPage(
         mainPanel(
             h3(textOutput("gvisTitle")),    
             htmlOutput("gvmap"),            
-            htmlOutput("top10tab"),
-            htmlOutput("countries"),
-            htmlOutput("lines")
+#             htmlOutput("top10tab"),
+#             htmlOutput("temp"),
+#             htmlOutput("temp2"),
+            h3("Trend of International Students by Country"),
+            htmlOutput("lines"),
+            htmlOutput("countrytab")
         )        
     )    
 ))
