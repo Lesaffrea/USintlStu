@@ -11,18 +11,23 @@ shinyUI(fluidPage(
                         min=2001, max=2014, value=2014,  step=1, animate=TRUE),
             
             h4("How has the number of international students evolved over last 10 years?"),
+            helpText('Navigate to "Trend Analysis" tab to view charts'),
             uiOutput("countrybox")
         ),
         mainPanel(
-            h3(textOutput("gvisTitle")),    
-            htmlOutput("gvmap"),            
-#             htmlOutput("top10tab"),
-#             htmlOutput("temp"),
-#             htmlOutput("temp2"),
-            h3("Trend of International Students by Country"),
-            helpText("Tick the checkboxes on the left to select the countries for plotting lines."),
-            htmlOutput("lines"),
-            htmlOutput("countrytab")
+            tabsetPanel(
+                tabPanel("Top Places of Origin", 
+                    h3(textOutput("gvisTitle")),    
+                    htmlOutput("gvmap") 
+                ),
+                tabPanel("Trend analysis",
+                    h3("Trend of International Students by Country"),
+                    helpText("Tick the checkboxes on the left to select the countries for plotting lines."),
+                    htmlOutput("lines"),
+                    helpText("Missing data may due to the fact that the country was not in the top 25 for that year."),
+                    htmlOutput("countrytab")
+                )
+            )
         )        
     )    
 ))

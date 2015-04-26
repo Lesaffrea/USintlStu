@@ -1,7 +1,6 @@
 library(shiny)
 library(googleVis)
 library(reshape2)
-library(dplyr)
 #suppressPackageStartupMessages(require(googleVis))
 
 files <- list.files("data", full.names=T)
@@ -64,23 +63,10 @@ shinyServer(
                                )
         })
         
-#         # Create the checkboxes and select them all by default
-#         checkboxGroupInput("columns", "Choose columns", 
-#                            choices  = colnames,
-#                            selected = colnames)
-        
         mycountries <- reactive ({
             input$countries
         })
         
-#         output$temp <- renderText({
-#             input$countries
-#         })
-# 
-#         output$temp2 <- renderText({
-#             c("Year","China","India","Japan")
-#         })
-
         output$countrytab <- renderTable({ 
             mylines <- linedata[, c("Year",input$countries), drop = FALSE]
             #mylines <- select(linedata, Year, input$countries)
@@ -89,11 +75,9 @@ shinyServer(
         
 
         output$lines <- renderGvis({
-            #colselected <- c(input$countries, "Mexico")
             mylines <- linedata[, c("Year",input$countries), drop = FALSE]
-            #mylines <- linedata[, c("Year","China","South Korea"), drop = FALSE]
             gvisLineChart(mylines,
-                          options=list(width=800, height=800)
+                          options=list(width=800, height=600)
             )
         })
         
